@@ -16,7 +16,11 @@ chmod +x scripts/generate-secrets.sh
 docker compose up --build -d
 ```
 
-Every push to `main` is also built for `linux/amd64` and `linux/arm64` by GitHub Actions and published as `ghcr.io/OWNER/gmail-agent-proxy:latest`. Version tags such as `v1.2.3` additionally publish `1.2.3` and `1.2` image tags. Pull requests build and test the image without publishing it.
+Every push to `main` is also built for `linux/amd64` and `linux/arm64` by GitHub Actions and published as `ghcr.io/encero/gmail-agent-proxy:latest`. Version tags such as `v1.2.3` additionally publish `1.2.3` and `1.2` image tags. Pull requests build and test the image without publishing it.
+
+```sh
+docker pull ghcr.io/encero/gmail-agent-proxy:latest
+```
 
 Open `http://127.0.0.1:3000/admin`, sign in with `secrets/admin_token`, and follow the page:
 
