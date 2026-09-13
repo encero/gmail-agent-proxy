@@ -1,0 +1,48 @@
+services:
+  gmail-agent-proxy:
+    build: .
+    restart: unless-stopped
+    environment:
+      DATABASE_PATH: /app/data/proxy.sqlite
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://127.0.0.1:3000}
+      API_TOKEN_FILE: /run/secrets/api_token
+      ADMIN_TOKEN_FILE: /run/secrets/admin_token
+      ENCRYPTION_KEY_FILE: /run/secrets/encryption_key
+      AUDIT_RETENTION_DAYS: ${AUDIT_RETENTION_DAYS:-90}
+    secrets:
+      - api_token
+      - admin_token
+      - encryption_key
+    volumes:
+      - gmail_proxy_data:/app/data
+    ports:
+      - "127.0.0.1:${GMAIL_PROXY_PORT:-3000}:3000"
+    networks:
+      - hermes_mail
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,noexec,nosuid,nodev
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/healthz').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  gmail_proxy_data:
+
+networks:
+  hermes_mail:
+    name: ${HERMES_NETWORK:-hermes-mail}
+
+secrets:
+  api_token:
+    file: ./secrets/api_token
+  admin_token:
+    file: ./secrets/admin_token
+  encryption_key:
+    file: ./secrets/encryption_key
