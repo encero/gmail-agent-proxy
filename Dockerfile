@@ -9,12 +9,12 @@ RUN npm run build && npm prune --omit=dev
 FROM node:24-bookworm-slim
 ENV NODE_ENV=production
 WORKDIR /app
-RUN groupadd --system --gid 10001 proxy && useradd --system --uid 10001 --gid proxy --home-dir /app proxy
-COPY --from=build --chown=proxy:proxy /app/package.json ./package.json
-COPY --from=build --chown=proxy:proxy /app/node_modules ./node_modules
-COPY --from=build --chown=proxy:proxy /app/dist ./dist
-RUN mkdir /app/data && chown proxy:proxy /app/data
-USER proxy
+RUN groupadd --system --gid 10001 gmailproxy && useradd --system --uid 10001 --gid gmailproxy --home-dir /app gmailproxy
+COPY --from=build --chown=gmailproxy:gmailproxy /app/package.json ./package.json
+COPY --from=build --chown=gmailproxy:gmailproxy /app/node_modules ./node_modules
+COPY --from=build --chown=gmailproxy:gmailproxy /app/dist ./dist
+RUN mkdir /app/data && chown gmailproxy:gmailproxy /app/data
+USER gmailproxy
 EXPOSE 3000
 VOLUME ["/app/data"]
 CMD ["node", "dist/index.js"]
